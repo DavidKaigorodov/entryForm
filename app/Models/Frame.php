@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Frame extends Model
 {
     protected
-    $table = 'main__frame',
+    $table = 'main__frames',
     $fillable = [
         'token',
         'division_id',
