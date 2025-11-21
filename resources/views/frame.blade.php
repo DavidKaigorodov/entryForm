@@ -276,6 +276,7 @@
                 </div>
 
                 <!-- Шаг 2 -->
+                @dd($frame->division->group->divisions->count());
                 @if ($frame->division->group->divisions->count() > 0)
                     <div class="step" id="step2">
                         <div class="step" id="step2">
