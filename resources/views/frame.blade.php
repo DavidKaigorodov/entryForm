@@ -276,7 +276,7 @@
                 </div>
 
                 <!-- Шаг 2 -->
-                @if ($frame->division->group_id && $frame->division->group && $frame->division->group->divisions->count() > 0)
+                @if ($frame->division->group->divisions->count() > 0)
                     <div class="step" id="step2">
                         <div class="step" id="step2">
                             <h3>2. Подразделение *</h3>
