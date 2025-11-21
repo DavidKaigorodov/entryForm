@@ -21,7 +21,7 @@ class DivisionGroup extends Model
 
     public function divisions(): HasMany
     {
-        return $this->hasMany(Division::class, 'id');
+        return $this->hasMany(Division::class, 'group_id');
     }
 
 }
