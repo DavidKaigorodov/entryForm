@@ -276,14 +276,14 @@
                 </div>
 
                 <!-- Шаг 2 -->
-                @if ($frame->division->childrens()->count() > 0)
+                @if ($frame->division->group()->count() > 0)
                     <div class="step" id="step2">
                         <h3>2. Подразделение *</h3>
                         <div class="form-group">
                             <label for="division_id" class="required">Выберите подразделение</label>
                             <select id="division_id" name="division_id">
                                 <option value="">Выберите подразделение</option>
-                                @foreach ($frame->division->childrens as $child)
+                                @foreach ($frame->division->group() as $child)
                                     <option value="{{ $child->id }}">{{ $child->name }}</option>
                                 @endforeach
                             </select>

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Division extends Model
@@ -21,7 +21,7 @@ class Division extends Model
         'name',
         'address',
         'city_id',
-        'parent_id'
+        'group_id'
     ];
 
     ### Связи
@@ -31,8 +31,8 @@ class Division extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-        public function childrens(): HasMany
+        public function group(): BelongsTo
     {
-        return $this->hasMany(Division::class, 'parent_id');
+        return $this->belongsTo(DivisionGroup::class, 'group_id');
     }
 }

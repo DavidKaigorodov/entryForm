@@ -13,7 +13,6 @@ class Frame extends Model
     $fillable = [
         'token',
         'division_id',
-        'status_id',
     ];
 
     public function division(): BelongsTo
