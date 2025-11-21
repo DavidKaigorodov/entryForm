@@ -278,20 +278,18 @@
                 <!-- Шаг 2 -->
                 @if ($frame->division->group->divisions->count() > 0)
                     <div class="step" id="step2">
-                        <div class="step" id="step2">
-                            <h3>2. Подразделение *</h3>
-                            <div class="form-group">
-                                <label for="division_id" class="required">Выберите подразделение</label>
-                                <select id="division_id" name="division_id">
-                                    <option value="">Выберите подразделение</option>
+                        <h3>2. Подразделение *</h3>
+                        <div class="form-group">
+                            <label for="division_id" class="required">Выберите подразделение</label>
+                            <select id="division_id" name="division_id">
+                                <option value="">Выберите подразделение</option>
 
-                                    @foreach ($frame->division->group->divisions as $child)
-                                        <option value="{{ $child->id }}">{{ $child->name }}</option>
-                                    @endforeach
+                                @foreach ($frame->division->group->divisions as $child)
+                                    <option value="{{ $child->id }}">{{ $child->name }}</option>
+                                @endforeach
 
-                                </select>
-                                <div class="error" id="departmentError"></div>
-                            </div>
+                            </select>
+                            <div class="error" id="departmentError"></div>
                         </div>
                     </div>
                 @else
@@ -381,13 +379,15 @@
         (function($) {
             let currentStep = 1;
             const totalSteps = 5;
+
             const $service = $('#service_id'),
                 $worker = $('#worker_id'),
                 $time = $('#time'),
                 $division = $('#division_id');
 
-            const apiRoutes = JSON.parse($('meta[name="api-routes"]').attr('content'))
-            const divisionId = {{ $frame->division->id }};
+            const apiRoutes = JSON.parse($('meta[name="api-routes"]').attr('content'));
+
+            let divisionId = {{ $frame->division->id }};
 
             const cache = {
                 services: null,
@@ -441,11 +441,20 @@
                     .val());
                 $('#confirmPhone').text($('#phone').val());
                 $('#confirmEmail').text($('#email').val() || '—');
-                $('#confirmDepartment').text($('#division_id').data('name') || $division.find('option:selected')
-                    .text() || '—');
+
+                $('#confirmDepartment').text(
+                    $('#division_id').data('name') ||
+                    $division.find('option:selected').text() ||
+                    '—'
+                );
+
                 $('#confirmService').text($service.find('option:selected').text() || '—');
                 $('#confirmWorker').text($worker.find('option:selected').text() || '—');
-                $('#confirmDateTime').text(($('#date').val() || '—') + ($time.val() ? ' в ' + $time.val() : ''));
+
+                $('#confirmDateTime').text(
+                    ($('#date').val() || '—') +
+                    ($time.val() ? ' в ' + $time.val() : '')
+                );
             }
 
             function validateStep(step) {
@@ -522,18 +531,21 @@
                 }
             });
 
-
             function loadServices() {
-                if (cache.services) return renderServices(cache.services);
+                if (!divisionId) return;
+
+                $service.empty().append('<option>Загрузка...</option>');
+                $worker.empty().append('<option>Сначала выберите услугу</option>').prop('disabled', true);
+
                 $.getJSON(apiRoutes['servises.index'], {
                         division: divisionId
                     })
                     .done(data => {
-                        const validServices = data.filter(s => s.workers && s.workers.length > 0);
-                        cache.services = validServices;
-                        renderServices(validServices);
+                        const valid = data.filter(s => s.workers && s.workers.length > 0);
+                        cache.services = valid;
+                        renderServices(valid);
                     })
-                    .fail(() => alert('Ошибка загрузки данных.'));
+                    .fail(() => alert('Ошибка загрузки услуг'));
             }
 
             function renderServices(data) {
@@ -550,14 +562,14 @@
                     return;
                 }
 
-                const selectedService = cache.services.find(s => s.id == serviceId);
-                if (!selectedService || !selectedService.workers?.length) {
+                const selected = cache.services.find(s => s.id == serviceId);
+                if (!selected || !selected.workers?.length) {
                     $worker.append('<option>Нет специалистов</option>');
                     return;
                 }
 
                 $worker.append('<option value="">Выберите специалиста</option>');
-                selectedService.workers.forEach(w =>
+                selected.workers.forEach(w =>
                     $worker.append(`<option value="${w.id}">${w.full_name}</option>`)
                 );
                 $worker.prop('disabled', false);
@@ -578,7 +590,7 @@
                         cache.allowedDays = days.map(Number);
                         initFlatpickr();
                     })
-                    .fail(() => alert('Ошибка загрузки рабочих дней специалиста'));
+                    .fail(() => alert('Ошибка загрузки доступных дней'));
             });
 
             $('#date').change(function() {
@@ -590,6 +602,7 @@
                 if (cache.times[key]) return renderTimes(cache.times[key]);
 
                 $time.prop('disabled', true).empty().append('<option>Загрузка...</option>');
+
                 $.getJSON(apiRoutes['avalibleTime.index'], {
                         worker: workerId,
                         service: serviceId,
@@ -612,7 +625,23 @@
                 $time.prop('disabled', false);
             }
 
-            loadServices();
+            $division.change(function() {
+                divisionId = $(this).val();
+
+                cache.services = null;
+                cache.times = {};
+                cache.allowedDays = [];
+
+                $service.val('');
+                $worker.val('').prop('disabled', true).empty().append(
+                    '<option>Сначала выберите услугу</option>');
+                $('#date').val('');
+                $time.val('').prop('disabled', true).empty().append('<option>Сначала выберите дату</option>');
+
+                // Загружаем данные
+                if (divisionId) loadServices();
+            });
+
             showStep(1);
         })(jQuery);
     </script>
