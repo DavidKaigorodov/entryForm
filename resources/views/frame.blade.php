@@ -276,29 +276,38 @@
                 </div>
 
                 <!-- Шаг 2 -->
-                @if ($frame->division->group()->count() > 0)
+                @if ($frame->division->group_id && $frame->division->group && $frame->division->group->divisions->count() > 0)
                     <div class="step" id="step2">
-                        <h3>2. Подразделение *</h3>
-                        <div class="form-group">
-                            <label for="division_id" class="required">Выберите подразделение</label>
-                            <select id="division_id" name="division_id">
-                                <option value="">Выберите подразделение</option>
-                                @foreach ($frame->group->divisions() as $child)
-                                    <option value="{{ $child->id }}">{{ $child->name }}</option>
-                                @endforeach
-                            </select>
-                            <div class="error" id="departmentError"></div>
+                        <div class="step" id="step2">
+                            <h3>2. Подразделение *</h3>
+                            <div class="form-group">
+                                <label for="division_id" class="required">Выберите подразделение</label>
+                                <select id="division_id" name="division_id">
+                                    <option value="">Выберите подразделение</option>
+
+                                    @foreach ($frame->division->group->divisions as $child)
+                                        <option value="{{ $child->id }}">{{ $child->name }}</option>
+                                    @endforeach
+
+                                </select>
+                                <div class="error" id="departmentError"></div>
+                            </div>
                         </div>
                     </div>
                 @else
                     <div class="step" id="step2">
                         <h3>2. Подразделение</h3>
                         <div class="form-group">
-                            <label class="required">Подразделение — {{ $frame->division->name }}</label>
+                            <label class="required">
+                                Подразделение — {{ $frame->division->name }}
+                            </label>
+
                             <input type="hidden" id="division_id" name="division_id" value="{{ $frame->division->id }}"
                                 data-name="{{ $frame->division->name }}">
                         </div>
                     </div>
+
+
                 @endif
 
                 <!-- Шаг 3 -->
