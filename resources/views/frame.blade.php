@@ -283,7 +283,7 @@
                             <label for="division_id" class="required">Выберите подразделение</label>
                             <select id="division_id" name="division_id">
                                 <option value="">Выберите подразделение</option>
-                                @foreach ($frame->division->group() as $child)
+                                @foreach ($frame->group->divisions() as $child)
                                     <option value="{{ $child->id }}">{{ $child->name }}</option>
                                 @endforeach
                             </select>
