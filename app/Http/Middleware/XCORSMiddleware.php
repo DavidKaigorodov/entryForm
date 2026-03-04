@@ -23,7 +23,9 @@ class XCORSMiddleware
         if($frame->division?->url === null)
             abort(404);
 
+        $response = $next($request);
+        $response->headers->set('Content-Security-Policy', 'frame-ancestors ' . $frame->division->url);
 
-        return $next($request)->header('Content-Security-Policy', 'frame-ancestors ' . $frame->division->url);
+        return $response;
     }
 }

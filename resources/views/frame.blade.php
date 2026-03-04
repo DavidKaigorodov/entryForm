@@ -103,6 +103,14 @@
             color: #666;
         }
 
+        .extra-info {
+            background: #e8f1ff;
+            border-left: 4px solid #5c8dff;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
         .comment-group {
             position: relative;
             margin-top: 16px;
@@ -169,6 +177,14 @@
                 line-height: 1.4;
             }
 
+            .extra-info {
+                background: #e8f1ff;
+                border-left: 4px solid #5c8dff;
+                padding: 12px 16px;
+                border-radius: 6px;
+                margin-top: 10px;
+            }
+
             .form-group {
                 margin-bottom: 10px;
             }
@@ -223,16 +239,31 @@
     <div class="container">
         <div class="text-block">
             <h1>Записаться на приём</h1>
+
             <p class="small">
-                Для Вашего удобства и экономии времени предлагаем возможность предварительной онлайн-записи на прием в
-                органы
-                социальной защиты населения Кузбасса.
+                Для Вашего удобства и экономии времени предлагаем возможность предварительной онлайн-записи
+                на прием в органы социальной защиты населения Кузбасса.
                 Запись осуществляется по месту жительства (месту пребывания) гражданина, являющегося заявителем.
             </p>
+
             <p class="small">
                 Поля, отмеченные звездочкой (*) обязательны для заполнения.
                 Подтверждение факта онлайн-записи будет направлено на электронную почту, указанную при заполнении формы.
+            </p>
 
+            <p class="small extra-info" id="info-step-1" style="display:none;">
+                Если хотите получить уведомление с информацией о записи, пожалуйста, укажите почту.
+            </p>
+
+            <p class="small extra-info" id="info-step-3" style="display:none;">
+                Уведомляем, что при одновременном получении нескольких государственных услуг — каждая требует
+                отдельной электронной записи.
+            </p>
+
+            <p class="small extra-info" id="info-step-5" style="display:none;">
+                Если по каким-либо причинам Вы не сможете посетить органы социальной защиты в выбранное время,
+                запись необходимо отменить — позвоните в УСЗН. Сотрудник аннулирует предварительную запись и освободит
+                зарезервированное вами время для других посетителей.
             </p>
         </div>
         <div class="form-container">
@@ -363,6 +394,8 @@
                             placeholder="Введите комментарий..."></textarea>
                         <div id="commentCounter">0 / 500</div>
                     </div>
+                    {{-- <div class="politic"><a href="{{ $frame->division->politic }}">Политика обработки персональных данных</a></div> --}}
+
                 </div>
 
                 <div class="navigation">
@@ -403,6 +436,8 @@
                 flatpickrInstance = flatpickr("#date", {
                     minDate: "today",
                     dateFormat: "Y-m-d",
+                    altInput: true,
+                    altFormat: "d.m.Y",
                     disable: [
                         function(date) {
                             const day = date.getDay();
@@ -431,9 +466,20 @@
             function showStep(step) {
                 $('.step').removeClass('active');
                 $('#step' + step).addClass('active');
+
+                $('#info-step-1').toggle(step === 1);
+                $('#info-step-3').toggle(step === 3);
+                $('#info-step-5').toggle(step === 5);
+
                 $('#prevBtn').prop('disabled', step === 1);
                 $('#nextBtn').text(step === totalSteps ? 'Отправить' : 'Далее');
                 if (step === totalSteps) updateConfirmation();
+            }
+
+            function formatDateHuman(dateStr) {
+                if (!dateStr) return "";
+                const [y, m, d] = dateStr.split("-");
+                return `${d}.${m}.${y}`;
             }
 
             function updateConfirmation() {
@@ -452,7 +498,7 @@
                 $('#confirmWorker').text($worker.find('option:selected').text() || '—');
 
                 $('#confirmDateTime').text(
-                    ($('#date').val() || '—') +
+                    (formatDateHuman($('#date').val()) || '—') +
                     ($time.val() ? ' в ' + $time.val() : '')
                 );
             }
@@ -638,7 +684,6 @@
                 $('#date').val('');
                 $time.val('').prop('disabled', true).empty().append('<option>Сначала выберите дату</option>');
 
-                // Загружаем данные
                 if (divisionId) loadServices();
             });
 
